@@ -15,7 +15,7 @@ class Parser {
     }
 
     private Expr equality() {
-        Expr expr = comparision();
+        Expr expr = comparison();
         while (match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
             Token operator = previous();
             Expr right = comparison();
