@@ -76,6 +76,30 @@ public class Scanner {
             case '/':
                 if (match('/')) {
                     while (peek() != '\n' && !isAtEnd()) advance();
+                } else if (match('*')) {
+                    int depth = 1;
+
+                    while (!isAtEnd()) {
+                        if (peek() == '\n') line++;
+                        if (peek() == '*' && peekNext() == '/') {
+                            depth--;
+                            if (depth == 0) break;
+                            advance(); // consume '*'
+                            advance(); // consume '/'
+                        } else if (peek() == '/' && peekNext() == '*') {
+                            depth++;
+                            advance(); // consume '/'
+                            advance(); // consume '*'
+                        } else {
+                            advance();
+                        }
+                    }
+                    if (peek() == '*' && peekNext() == '/') {
+                        advance(); // consume '*'
+                        advance(); // consume '/'
+                    } else {
+                        Lox.error(line, "Unterminated block comment.");
+                    }
                 } else {
                     addToken(TokenType.SLASH);
                 }
