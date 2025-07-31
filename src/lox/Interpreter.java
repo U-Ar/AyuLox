@@ -52,6 +52,15 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Object visitCommaExpr(Expr.Comma expr) {
+        Object value = null;
+        for (Expr elem : expr.expressions) {
+            value = evaluate(elem);
+        }
+        return value;
+    }
+
+    @Override
     public Object visitAssignExpr(Expr.Assign expr) {
         Object value = evaluate(expr.value);
 

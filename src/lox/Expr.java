@@ -4,6 +4,7 @@ import java.util.List;
 
 abstract class Expr {
   interface Visitor<R> {
+    R visitCommaExpr(Comma expr);
     R visitAssignExpr(Assign expr);
     R visitBinaryExpr(Binary expr);
     R visitCallExpr(Call expr);
@@ -16,6 +17,18 @@ abstract class Expr {
     R visitThisExpr(This expr);
     R visitUnaryExpr(Unary expr);
     R visitVariableExpr(Variable expr);
+  }
+  static class Comma extends Expr {
+    Comma(List<Expr> expressions) {
+      this.expressions = expressions;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitCommaExpr(this);
+    }
+
+    final List<Expr> expressions;
   }
   static class Assign extends Expr {
     Assign(Token name, Expr value) {

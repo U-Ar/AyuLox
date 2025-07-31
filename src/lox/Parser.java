@@ -196,7 +196,17 @@ class Parser {
     }
 
     private Expr expression() {
-        return assignment();
+        Expr expr = assignment();
+
+         if (match(COMMA)) {
+            List<Expr> expressions = new ArrayList<>();
+            expressions.add(expr);
+            do {
+                expressions.add(assignment());
+            } while (match(COMMA));
+            return new Expr.Comma(expressions);
+        }
+        return expr;
     }
 
     private Expr assignment() {

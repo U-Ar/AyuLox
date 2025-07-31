@@ -19,7 +19,7 @@ whileStmt -> "while" "(" expresion ")" statement ;
 block -> "{" declaration* "}" ;
 
 
-expression -> assignment ;
+expression -> assignment ( "," assignment )* ;
 
 assignment -> ( call "." )? IDENTIFIER "=" assignment
            | logic_or ;

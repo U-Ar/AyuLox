@@ -104,6 +104,14 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitCommaExpr(Expr.Comma expr) {
+        for (Expr elem : expr.expressions) {
+            resolve(elem);
+        }
+        return null;
+    }
+
+    @Override
     public Void visitAssignExpr(Expr.Assign expr) {
         resolve(expr.value);
         resolveLocal(expr, expr.name);
