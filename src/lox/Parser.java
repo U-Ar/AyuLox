@@ -244,6 +244,16 @@ class Parser {
     }
 
     private Expr or() {
+        if (match(OR)) {
+            Token operator = previous();
+            error(operator, "Binary operator without left operand.");
+            Expr right = and();
+            while (match(OR)) {
+                right = and();
+            }
+            return null;
+        }
+
         Expr expr = and();
 
         while (match(OR)) {
@@ -256,6 +266,16 @@ class Parser {
     }
 
     private Expr and() {
+        if (match(AND)) {
+            Token operator = previous();
+            error(operator, "Binary operator without left operand.");
+            Expr right = equality();
+            while (match(AND)) {
+                right = equality();
+            }
+            return null;
+        }
+
         Expr expr = equality();
 
         while (match(AND)) {
@@ -268,6 +288,16 @@ class Parser {
     }
 
     private Expr equality() {
+        if (match(BANG_EQUAL, EQUAL_EQUAL)) {
+            Token operator = previous();
+            error(operator, "Binary operator without left operand.");
+            Expr right = comparison();
+            while (match(BANG_EQUAL, EQUAL_EQUAL)) {
+                right = comparison();
+            }
+            return null;
+        }
+
         Expr expr = comparison();
         while (match(BANG_EQUAL, EQUAL_EQUAL)) {
             Token operator = previous();
@@ -310,6 +340,16 @@ class Parser {
     }
 
     private Expr comparison() {
+        if (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
+            Token operator = previous();
+            error(operator, "Binary operator without left operand.");
+            Expr right = term();
+            while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
+                right = term();
+            }
+            return null;
+        }
+
         Expr expr = term();
 
         while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
@@ -334,6 +374,16 @@ class Parser {
     }
 
     private Expr factor() {
+        if (match(SLASH, STAR)) {
+            Token operator = previous();
+            error(operator, "Binary operator without left operand.");
+            Expr right = unary();
+            while (match(SLASH, STAR)) {
+                right = unary();
+            }
+            return null;
+        }
+
         Expr expr = unary();
 
         while (match(SLASH, STAR)) {
