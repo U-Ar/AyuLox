@@ -74,6 +74,15 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Object visitTernaryExpr(Expr.Ternary expr) {
+        if (isTruthy(evaluate(expr.condition))) {
+            return evaluate(expr.left);
+        } else {
+            return evaluate(expr.right);
+        }
+    }
+
+    @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
     }

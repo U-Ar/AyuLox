@@ -210,7 +210,7 @@ class Parser {
     }
 
     private Expr assignment() {
-        Expr expr = or();
+        Expr expr = ternary();
 
         if (match(EQUAL)) {
             Token equals = previous();
@@ -223,6 +223,22 @@ class Parser {
                 return new Expr.Set(get.object, get.name, value);
             }
             error(equals, "Invalid assignment target.");
+        }
+        return expr;
+    }
+
+    private Expr ternary() {
+        Expr expr = or();
+
+        if (match(QUESTION)) {
+            Token question = previous();
+            Expr left = ternary();
+
+            if (match(COLON)) {
+                Expr right = ternary();
+                return new Expr.Ternary(expr, left, right);
+            }
+            error(question, "Expect colon after question operator.");
         }
         return expr;
     }

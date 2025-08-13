@@ -1,13 +1,15 @@
-fun fib(n) {
+print 1 == 1 ? "true" : "false";
+print 1 == 1 ? 2 < 3 ? "true and true" : "true and false" : "false and false";
+print 1 == 1 ? 2 > 3 ? "true and true" : "true and false" : "false and false";
+print 1 == 2 ? 2 > 3 ? "true and true" : "true and false" : "false and false";
+print 1 == 2 ? "true" : 2 == 3 ? "false and true" : "false and false";
+
+/*fun fib(n) {
   if (n < 2) return n;
     return fib(n - 1) + fib(n - 2);
 }
 
 var before = clock();
-// calculate the 20th Fibonacci number
-/*
- * Block comment /* nested block comment */
-*/
 print fib(20);
 var after = clock();
 print after - before;
@@ -17,5 +19,5 @@ print x;
 
 var y = 1;
 y = (y=56, y);
-print y;
+print y;*/
 

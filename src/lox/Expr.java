@@ -14,6 +14,7 @@ abstract class Expr {
     R visitLogicalExpr(Logical expr);
     R visitSetExpr(Set expr);
     R visitSuperExpr(Super expr);
+    R visitTernaryExpr(Ternary expr);
     R visitThisExpr(This expr);
     R visitUnaryExpr(Unary expr);
     R visitVariableExpr(Variable expr);
@@ -159,6 +160,22 @@ abstract class Expr {
 
     final Token keyword;
     final Token method;
+  }
+  static class Ternary extends Expr {
+    Ternary(Expr condition, Expr left, Expr right) {
+      this.condition = condition;
+      this.left = left;
+      this.right = right;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitTernaryExpr(this);
+    }
+
+    final Expr condition;
+    final Expr left;
+    final Expr right;
   }
   static class This extends Expr {
     This(Token keyword) {
