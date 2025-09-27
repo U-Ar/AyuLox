@@ -10,6 +10,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
     private ClassType currentClass = ClassType.NONE;
+    private boolean isLoop = false;
 
     Resolver(Interpreter interpreter) {
         this.interpreter = interpreter;
@@ -137,6 +138,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private void resolveFunction(Stmt.Function function, FunctionType type) {
         FunctionType enclosingFunction = currentFunction;
         currentFunction = type;
+        boolean enclosingIsLoop = isLoop;
+        isLoop = false;
 
         beginScope();
         for (Token param: function.params) {
@@ -147,12 +150,15 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         endScope();
 
         currentFunction = enclosingFunction;
+        isLoop = enclosingIsLoop;
     }
 
     @Override
     public Void visitClassStmt(Stmt.Class stmt) {
         ClassType enclosingClass = currentClass;
         currentClass = ClassType.CLASS;
+        boolean enclosingIsLoop = isLoop;
+        isLoop = false;
 
         declare(stmt.name);
         define(stmt.name);
@@ -187,6 +193,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
 
         currentClass = enclosingClass;
+        isLoop = enclosingIsLoop;
         return null;
     }
 
@@ -227,9 +234,23 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitBreakStmt(Stmt.Break stmt) {
+        if (!isLoop) {
+            Lox.error(stmt.keyword, "Can't break outside of a loop.");
+        }
+        return null;
+    }
+
+    @Override
     public Void visitWhileStmt(Stmt.While stmt) {
         resolve(stmt.condition);
+
+        boolean enclosingIsLoop = isLoop;
+        isLoop = true;
+
         resolve(stmt.body);
+
+        isLoop = enclosingIsLoop;
         return null;
     }
 

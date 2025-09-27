@@ -31,6 +31,7 @@ public class GenerateAst {
         ));
         defineAst(outputDir, "Stmt", Arrays.asList(
                 "Block : List<Stmt> statements",
+                "Break : Token keyword",
                 "Class : Token name, Expr.Variable superclass, List<Stmt.Function> methods",
                 "Expression : Expr expression",
                 "Function : Token name, List<Token> params, List<Stmt> body",
