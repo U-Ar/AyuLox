@@ -7,13 +7,16 @@ import java.util.List;
 import static lox.TokenType.*;
 
 class Parser {
-    private static class ParseError extends RuntimeException {}
+    static class ParseError extends RuntimeException {}
 
     private final List<Token> tokens;
+    private final boolean printError;
+
     private int current = 0;
 
-    Parser(List<Token> tokens) {
+    Parser(List<Token> tokens, boolean printError) {
         this.tokens = tokens;
+        this.printError = printError;
     }
 
     List<Stmt> parse() {
@@ -195,7 +198,7 @@ class Parser {
         return new Stmt.Expression(expr);
     }
 
-    private Expr expression() {
+    Expr expression() {
         Expr expr = assignment();
 
          if (match(COMMA)) {
@@ -327,7 +330,7 @@ class Parser {
         return previous();
     }
 
-    private boolean isAtEnd() {
+    boolean isAtEnd() {
         return peek().type == EOF;
     }
 
@@ -475,7 +478,9 @@ class Parser {
     }
 
     private ParseError error(Token token, String message) {
-        Lox.error(token, message);
+        if (printError) {
+            Lox.error(token, message);
+        }
         return new ParseError();
     }
 

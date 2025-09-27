@@ -40,7 +40,7 @@ public class Lox {
             System.out.print("> ");
             String line = reader.readLine();
             if (line == null) break;
-            run(line);
+            runLine(line);
             hadError = false;
         }
     }
@@ -49,7 +49,47 @@ public class Lox {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
-        Parser parser = new Parser(tokens);
+        Parser parser = new Parser(tokens, true);
+        List<Stmt> statements = parser.parse();
+
+        if (hadError) return;
+
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(statements);
+
+        if (hadError) return;
+
+        interpreter.interpret(statements);
+    }
+
+    private static void runLine(String source) {
+        Scanner scanner = new Scanner(source);
+        List<Token> tokens = scanner.scanTokens();
+
+        try {
+            Parser parser = new Parser(tokens, false);
+            Expr expr = parser.expression();
+            if (parser.isAtEnd()) {
+                if (hadError) return;
+
+                Resolver resolver = new Resolver(interpreter);
+                resolver.resolve(expr);
+
+                if (hadError) return;
+
+                Object result = interpreter.evaluate(expr);
+                if (result != null) {
+                    System.out.println(result.toString());
+                } else {
+                    System.out.println("nil");
+                }
+                return;
+            }
+        } catch (Parser.ParseError error) {
+            hadError = false;
+        }
+
+        Parser parser = new Parser(tokens, true);
         List<Stmt> statements = parser.parse();
 
         if (hadError) return;
