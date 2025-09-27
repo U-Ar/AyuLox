@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static lox.Undefined.getUndefined;
+
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     final Environment globals = new Environment();
@@ -191,11 +193,17 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Object lookUpVariable(Token name, Expr expr) {
         Integer distance = locals.get(expr);
+        Object var;
         if (distance != null) {
-            return environment.getAt(distance, name.lexeme);
+            var = environment.getAt(distance, name.lexeme);
         } else {
-            return globals.get(name);
+            var = globals.get(name);
         }
+
+        if (var == getUndefined()) {
+            throw new RuntimeError(name, "Variable " + name.lexeme + " is not initialized.");
+        }
+        return var;
     }
 
     @Override
@@ -316,7 +324,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
-        Object value = null;
+        Object value = getUndefined();
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
         }
