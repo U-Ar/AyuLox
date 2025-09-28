@@ -19,6 +19,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private enum FunctionType {
         NONE,
         FUNCTION,
+        LAMBDA,
         INITIALIZER,
         METHOD
     }
@@ -63,6 +64,9 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     public Void visitVarStmt(Stmt.Var stmt) {
         declare(stmt.name);
         if (stmt.initializer != null) {
+            if (stmt.initializer instanceof Expr.Lambda) {
+                define(stmt.name);
+            }
             resolve(stmt.initializer);
         }
         define(stmt.name);
@@ -129,8 +133,10 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt) {
-        declare(stmt.name);
-        define(stmt.name);
+        if (!stmt.name.lexeme.isEmpty()) {
+            declare(stmt.name);
+            define(stmt.name);
+        }
         resolveFunction(stmt, FunctionType.FUNCTION);
         return null;
     }
@@ -279,6 +285,27 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     @Override
     public Void visitGroupingExpr(Expr.Grouping expr) {
         resolve(expr.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitLambdaExpr(Expr.Lambda lambda) {
+        FunctionType enclosingFunction = currentFunction;
+        currentFunction = FunctionType.LAMBDA;
+        boolean enclosingIsLoop = isLoop;
+        isLoop = false;
+
+        beginScope();
+        for (Token param: lambda.params) {
+            declare(param);
+            define(param);
+        }
+        resolve(lambda.body);
+        endScope();
+
+        currentFunction = enclosingFunction;
+        isLoop = enclosingIsLoop;
+
         return null;
     }
 
